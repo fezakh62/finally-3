@@ -4,7 +4,7 @@ import FiltersDrawer from '../components/filters/FiltersDrawer.jsx'
 import { INITIAL_FILTERS } from '../constants/filters.js'
 import useOmdbSearch from '../hooks/useOmdbSearch'
 
-export default function MovieGridPage({ title, initialQuery = '' }) {
+export default function MovieGridPage({ title, initialQuery = '', favorites = [], onFavoriteToggle }) {
   const [query, setQuery] = useState(initialQuery)
   const [draft, setDraft] = useState(initialQuery)
 
@@ -97,7 +97,12 @@ export default function MovieGridPage({ title, initialQuery = '' }) {
 
       <div className="grid">
         {sortedItems.map(m => (
-          <MovieCard key={m.imdbID} movie={m} />
+          <MovieCard
+            key={m.imdbID}
+            movie={m}
+            isFavorite={favorites.some(x => x.imdbID === m.imdbID)}
+            onFavoriteToggle={onFavoriteToggle}
+          />
         ))}
       </div>
 

@@ -1,7 +1,7 @@
 import { NavLink, Outlet, useNavigate, useSearchParams } from 'react-router-dom'
 import { useMemo, useState } from 'react'
 
-export default function AppLayout() {
+export default function AppLayout({ themeDark, onThemeChange, profile }) {
   const navigate = useNavigate()
   const [searchParams] = useSearchParams()
   const currentQ = searchParams.get('q') || ''
@@ -44,6 +44,15 @@ export default function AppLayout() {
           />
           <button type="submit">Search</button>
         </form>
+
+        <div className="header__right">
+          <button className="btn btn--ghost" type="button" onClick={() => onThemeChange(!themeDark)}>
+            {themeDark ? 'Light' : 'Dark'}
+          </button>
+          <div className="profile">
+            <div className="profile__name">{profile?.name || 'User'}</div>
+          </div>
+        </div>
       </header>
 
       <div className="content">
