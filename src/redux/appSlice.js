@@ -2,9 +2,12 @@ import { createSlice } from '@reduxjs/toolkit'
 import { getSavedValue } from '../utils/storage'
 
 const initialState = {
-  themeDark: getSavedValue('pixema-dark', false),
+  themeDark: getSavedValue('pixema-dark', true),
   favorites: getSavedValue('pixema-favorites', []),
-  profile: getSavedValue('pixema-profile', { name: 'Student', email: '' }),
+  profile: getSavedValue('pixema-profile', {
+    name: 'Fedor Zakharov',
+    email: 'f.zakharov302@gmail.com',
+  }),
 }
 
 const appSlice = createSlice({
@@ -25,4 +28,3 @@ const appSlice = createSlice({
 
 export const { setThemeDark, setFavorites, setProfile } = appSlice.actions
 export default appSlice.reducer
-

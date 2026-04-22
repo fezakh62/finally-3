@@ -8,4 +8,3 @@ export const getSavedValue = (key, fallback) => {
     return fallback
   }
 }
-

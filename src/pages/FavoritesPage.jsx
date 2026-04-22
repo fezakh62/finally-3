@@ -1,21 +1,54 @@
-import MovieCard from '../components/movies/MovieCard.jsx'
+import { useEffect, useState } from 'react'
+import { getMovieById } from '../Services/GlobalApi'
+import MovieCard from '../components/movies/MovieCard'
 
-export default function FavoritesPage({ favorites, onFavoriteToggle }) {
-  const hasItems = favorites && favorites.length > 0
+function FavoritesPage({ favorites, onFavoriteToggle }) {
+  const [movies, setMovies] = useState([])
+  const [loading, setLoading] = useState(false)
+
+  useEffect(() => {
+    const fetchFavorites = async () => {
+      if (!favorites.length) {
+        setMovies([])
+        return
+      }
+
+      setLoading(true)
+      const settled = await Promise.all(
+        favorites.map(async id => {
+          try {
+            const resp = await getMovieById(id)
+            return resp.data?.Response === 'False' ? null : resp.data
+          } catch {
+            return null
+          }
+        }),
+      )
+
+      setMovies(settled.filter(Boolean))
+      setLoading(false)
+    }
+
+    fetchFavorites()
+  }, [favorites])
 
   return (
-    <section className="page">
-      <h1>Избранное</h1>
-      {!hasItems ? <p>Пока пусто.</p> : null}
-
-      {hasItems ? (
-        <div className="grid">
-          {favorites.map(m => (
-            <MovieCard key={m.imdbID} movie={m} isFavorite onFavoriteToggle={onFavoriteToggle} />
-          ))}
-        </div>
-      ) : null}
+    <section>
+      <h1 className='page-title'>Favorites</h1>
+      {loading ? <p className='state-text'>Loading...</p> : null}
+      {!loading && !movies.length ? <p className='state-text'>Favorites list is empty</p> : null}
+      <div className='movies-grid'>
+        {movies.map(movie => (
+          <MovieCard
+            key={movie.imdbID}
+            movie={movie}
+            favorites={favorites}
+            onFavoriteToggle={onFavoriteToggle}
+          />
+        ))}
+      </div>
     </section>
   )
 }
 
+export default FavoritesPage

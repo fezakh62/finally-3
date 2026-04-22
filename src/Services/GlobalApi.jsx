@@ -2,6 +2,7 @@ import axios from 'axios'
 
 const OMDB_API_KEY = import.meta.env.VITE_OMDB_API_KEY || '2ed0492b'
 const OMDB_BASE_URL = 'https://www.omdbapi.com/'
+const OMDB_POSTER_BASE_URL = 'https://img.omdbapi.com/'
 
 export const searchMovies = ({ query, page = 1, type = '', year = '' }) => {
   const params = {
@@ -25,3 +26,4 @@ export const getMovieById = imdbId =>
     },
   })
 
+export const getPosterApiUrl = imdbId => `${OMDB_POSTER_BASE_URL}?apikey=${OMDB_API_KEY}&i=${imdbId}`

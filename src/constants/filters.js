@@ -1,6 +1,20 @@
-export const INITIAL_FILTERS = {
-  sortBy: 'year',
+export const INITIAL_APPLIED_FILTERS = {
   type: '',
-  year: '',
+  yearFrom: '',
+  yearTo: '',
+  ratingFrom: '',
+  ratingTo: '',
+  country: '',
+  sortBy: 'year',
 }
 
+export const INITIAL_DRAFT_FILTERS = {
+  sortBy: 'year',
+  query: '',
+  type: '',
+  yearFrom: '',
+  yearTo: '',
+  ratingFrom: '',
+  ratingTo: '',
+  country: '',
+}

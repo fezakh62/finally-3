@@ -1,13 +1,21 @@
 import { useLocation } from 'react-router-dom'
-import MovieGridPage from './MovieGridPage.jsx'
+import MovieGridPage from './MovieGridPage'
 
-export default function SearchPage({ favorites, onFavoriteToggle }) {
+function SearchPage({ favorites, onFavoriteToggle, filters, onRemoveFilter }) {
   const location = useLocation()
   const params = new URLSearchParams(location.search)
   const query = params.get('q') || ''
 
   return (
-    <MovieGridPage title="Search" initialQuery={query} favorites={favorites} onFavoriteToggle={onFavoriteToggle} />
+    <MovieGridPage
+      title='Search'
+      initialQuery={query}
+      favorites={favorites}
+      onFavoriteToggle={onFavoriteToggle}
+      filters={filters}
+      onRemoveFilter={onRemoveFilter}
+    />
   )
 }
 
+export default SearchPage

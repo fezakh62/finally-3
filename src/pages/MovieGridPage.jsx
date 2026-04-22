@@ -1,129 +1,138 @@
-import { useMemo, useState } from 'react'
-import MovieCard from '../components/movies/MovieCard.jsx'
-import FiltersDrawer from '../components/filters/FiltersDrawer.jsx'
-import { INITIAL_FILTERS } from '../constants/filters.js'
+import { useMemo } from 'react'
 import useOmdbSearch from '../hooks/useOmdbSearch'
+import MovieCard from '../components/movies/MovieCard'
 
-export default function MovieGridPage({ title, initialQuery = '', favorites = [], onFavoriteToggle }) {
-  const [query, setQuery] = useState(initialQuery)
-  const [draft, setDraft] = useState(initialQuery)
+function MovieGridPage({
+  title,
+  initialQuery,
+  favorites,
+  onFavoriteToggle,
+  allowSorting = false,
+  filters,
+  onRemoveFilter,
+}) {
+  const normalizedQuery = (initialQuery || '').trim()
+  const isQueryReady = normalizedQuery.length > 0
 
-  const enabled = useMemo(() => Boolean(query && query.trim().length >= 2), [query])
-  const [filtersOpen, setFiltersOpen] = useState(false)
-  const [appliedFilters, setAppliedFilters] = useState(INITIAL_FILTERS)
-  const [draftFilters, setDraftFilters] = useState(INITIAL_FILTERS)
-
-  const { items, loading, error, canLoadMore, showMore } = useOmdbSearch({
-    query,
-    enabled,
-    type: appliedFilters.type,
-    year: appliedFilters.year,
+  const { items, loading, error, canLoadMore, showMore, setItems } = useOmdbSearch({
+    query: normalizedQuery,
+    type: filters?.type || '',
+    year: '',
+    enabled: isQueryReady,
   })
 
-  const sortedItems = useMemo(() => {
-    const copy = [...items]
-    const by = appliedFilters.sortBy
+  const filteredItems = useMemo(() => {
+    const yearFrom = Number(filters?.yearFrom || 0)
+    const yearTo = Number(filters?.yearTo || 9999)
+    const ratingFrom = Number(filters?.ratingFrom || 0)
+    const ratingTo = Number(filters?.ratingTo || 10)
+    const country = (filters?.country || '').trim().toLowerCase()
 
-    if (by === 'title') {
-      copy.sort((a, b) => String(a.Title || '').localeCompare(String(b.Title || '')))
-    } else if (by === 'rating') {
-      copy.sort((a, b) => Number(b.imdbRating || 0) - Number(a.imdbRating || 0))
-    } else {
-      copy.sort((a, b) => Number(b.Year || 0) - Number(a.Year || 0))
+    return items.filter(movie => {
+      const movieYear = Number((movie.Year || '').slice(0, 4))
+      const movieRating = Number(movie.imdbRating || 0)
+      const movieCountry = String(movie.Country || '').toLowerCase()
+
+      const matchesYear = Number.isNaN(movieYear) ? false : movieYear >= yearFrom && movieYear <= yearTo
+      const matchesRating =
+        Number.isNaN(movieRating) ? ratingFrom === 0 && ratingTo === 10 : movieRating >= ratingFrom && movieRating <= ratingTo
+      const matchesCountry = !country || movieCountry.includes(country)
+
+      return matchesYear && matchesRating && matchesCountry
+    })
+  }, [items, filters])
+
+  const sortedItems = useMemo(() => {
+    const cloned = [...filteredItems]
+    const sortBy = filters?.sortBy || ''
+
+    if (sortBy === 'year') {
+      cloned.sort((a, b) => Number(b.Year?.slice(0, 4) || 0) - Number(a.Year?.slice(0, 4) || 0))
     }
 
-    return copy
-  }, [items, appliedFilters.sortBy])
+    if (sortBy === 'rating') {
+      const toNumber = value => {
+        const n = Number(value)
+        return Number.isFinite(n) ? n : 0
+      }
+      cloned.sort((a, b) => toNumber(b.imdbRating) - toNumber(a.imdbRating))
+    }
 
-  const submit = e => {
-    e.preventDefault()
-    setQuery(draft.trim())
+    return cloned
+  }, [filteredItems, filters?.sortBy])
+
+  const sortByYearDesc = () => {
+    const cloned = [...items]
+    cloned.sort((a, b) => Number(b.Year?.slice(0, 4) || 0) - Number(a.Year?.slice(0, 4) || 0))
+    setItems(cloned)
   }
 
-  const onDraftChange = patch => setDraftFilters(prev => ({ ...prev, ...patch }))
-  const applyFilters = () => {
-    setAppliedFilters(draftFilters)
-    setFiltersOpen(false)
-  }
-
-  const resetFilters = () => {
-    setDraftFilters(INITIAL_FILTERS)
-    setAppliedFilters(INITIAL_FILTERS)
-    setFiltersOpen(false)
-  }
-
-  const chips = useMemo(() => {
-    const list = []
-    if (appliedFilters.type) list.push({ key: 'type', label: `type: ${appliedFilters.type}` })
-    if (appliedFilters.year) list.push({ key: 'year', label: `year: ${appliedFilters.year}` })
-    if (appliedFilters.sortBy !== 'year') list.push({ key: 'sortBy', label: `sort: ${appliedFilters.sortBy}` })
-    return list
-  }, [appliedFilters])
+  const prettifyType = value => (value ? value.charAt(0).toUpperCase() + value.slice(1) : '')
 
   return (
-    <section className="page">
-      <div className="page__top">
-        <h1>{title}</h1>
-        <div className="page__controls">
-          <button className="btn btn--ghost" type="button" onClick={() => setFiltersOpen(true)}>
-            Filters
-          </button>
-        <form className="searchline" onSubmit={submit}>
-          <input
-            value={draft}
-            onChange={e => setDraft(e.target.value)}
-            placeholder="Search movies (min 2 chars)"
-            aria-label="Search movies"
-          />
-          <button type="submit" disabled={!draft.trim()}>
-            Go
-          </button>
-        </form>
-        </div>
-      </div>
-
-      {!enabled ? <div className="hint">Введите минимум 2 символа для поиска.</div> : null}
-      {error ? <div className="error">{error}</div> : null}
-
-      {chips.length ? (
-        <div className="chips">
-          {chips.map(c => (
-            <span key={c.key} className="chip">
-              {c.label}
-            </span>
-          ))}
+    <section>
+      <h1 className='page-title'>{title}</h1>
+      {filters?.type || filters?.yearFrom || filters?.yearTo || filters?.ratingFrom || filters?.ratingTo || filters?.country ? (
+        <div className='active-filters'>
+          {filters?.type ? (
+            <button type='button' className='filter-chip' onClick={() => onRemoveFilter?.('type')}>
+              {prettifyType(filters.type)}
+              <span className='filter-chip-close'>×</span>
+            </button>
+          ) : null}
+          {filters?.yearFrom || filters?.yearTo ? (
+            <button type='button' className='filter-chip' onClick={() => onRemoveFilter?.('yearRange')}>
+              {filters.yearFrom || '...'} - {filters.yearTo || '...'}
+              <span className='filter-chip-close'>×</span>
+            </button>
+          ) : null}
+          {filters?.ratingFrom || filters?.ratingTo ? (
+            <button type='button' className='filter-chip' onClick={() => onRemoveFilter?.('ratingRange')}>
+              {filters.ratingFrom || '...'} - {filters.ratingTo || '...'}
+              <span className='filter-chip-close'>×</span>
+            </button>
+          ) : null}
+          {filters?.country ? (
+            <button type='button' className='filter-chip' onClick={() => onRemoveFilter?.('country')}>
+              {filters.country}
+              <span className='filter-chip-close'>×</span>
+            </button>
+          ) : null}
         </div>
       ) : null}
 
-      <div className="grid">
-        {sortedItems.map(m => (
+      {allowSorting ? (
+        <div className='page-controls'>
+          <button type='button' onClick={sortByYearDesc} className='action-btn'>
+            Sort by year
+          </button>
+        </div>
+      ) : null}
+
+      {!isQueryReady ? <p className='state-text'>Введите запрос в строке поиска сверху</p> : null}
+      {isQueryReady && error ? <p className='state-text'>{error}</p> : null}
+      {isQueryReady && !error && !loading && sortedItems.length === 0 ? <p className='state-text'>Movie not found!</p> : null}
+      <div className='movies-grid'>
+        {sortedItems.map(movie => (
           <MovieCard
-            key={m.imdbID}
-            movie={m}
-            isFavorite={favorites.some(x => x.imdbID === m.imdbID)}
+            key={movie.imdbID}
+            movie={movie}
+            favorites={favorites}
             onFavoriteToggle={onFavoriteToggle}
           />
         ))}
       </div>
 
-      <div className="actions">
-        {loading ? <div className="hint">Loading...</div> : null}
+      <div className='page-bottom'>
+        {loading ? <p className='state-text'>Loading...</p> : null}
         {!loading && canLoadMore ? (
-          <button className="btn" type="button" onClick={showMore}>
+          <button onClick={showMore} className='show-more-btn'>
             Show more
           </button>
         ) : null}
       </div>
-
-      <FiltersDrawer
-        isOpen={filtersOpen}
-        onClose={() => setFiltersOpen(false)}
-        draftFilters={draftFilters}
-        onDraftChange={onDraftChange}
-        onApply={applyFilters}
-        onReset={resetFilters}
-      />
     </section>
   )
 }
 
+export default MovieGridPage

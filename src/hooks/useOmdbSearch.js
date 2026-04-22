@@ -1,7 +1,7 @@
 import { useEffect, useMemo, useState } from 'react'
 import { getMovieById, searchMovies } from '../Services/GlobalApi'
 
-export default function useOmdbSearch({ query, type = '', year = '', enabled = true }) {
+function useOmdbSearch({ query, type = '', year = '', enabled = true }) {
   const [items, setItems] = useState([])
   const [page, setPage] = useState(1)
   const [total, setTotal] = useState(0)
@@ -26,12 +26,16 @@ export default function useOmdbSearch({ query, type = '', year = '', enabled = t
       }
 
       const list = resp.data.Search || []
-      const enriched = await Promise.all(
+      const enrichedList = await Promise.all(
         list.map(async movie => {
           try {
             const detailsResp = await getMovieById(movie.imdbID)
             const details = detailsResp.data || {}
-            return { ...movie, imdbRating: details.imdbRating }
+            return {
+              ...movie,
+              imdbRating: details.imdbRating,
+              Country: details.Country,
+            }
           } catch {
             return movie
           }
@@ -39,7 +43,7 @@ export default function useOmdbSearch({ query, type = '', year = '', enabled = t
       )
 
       setTotal(Number(resp.data.totalResults || 0))
-      setItems(prev => (append ? [...prev, ...enriched] : enriched))
+      setItems(prev => (append ? [...prev, ...enrichedList] : enrichedList))
     } catch {
       setError('OMDb request failed')
     } finally {
@@ -49,9 +53,7 @@ export default function useOmdbSearch({ query, type = '', year = '', enabled = t
 
   useEffect(() => {
     setPage(1)
-    if (!enabled) return
     loadPage(1, false)
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [query, type, year, enabled])
 
   const showMore = () => {
@@ -60,6 +62,7 @@ export default function useOmdbSearch({ query, type = '', year = '', enabled = t
     loadPage(nextPage, true)
   }
 
-  return { items, loading, error, canLoadMore, showMore }
+  return { items, loading, error, canLoadMore, showMore, setItems }
 }
 
+export default useOmdbSearch

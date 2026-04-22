@@ -1,0 +1,65 @@
+@media (max-width: 768px) {
+  .pixema-layout {
+    display: block;
+    min-height: 100vh;
+    background: #07090f;
+  }
+
+  .pixema-sidebar {
+    padding: 16px;
+    border-right: 0;
+    border-bottom: 0;
+    background: #07090f;
+    flex-direction: row;
+    align-items: center;
+    justify-content: space-between;
+    gap: 10px;
+  }
+
+  .pixema-logo-image {
+    width: 120px;
+  }
+
+  .pixema-menu,
+  .pixema-copy,
+  .pixema-profile,
+  .page-title,
+  .pixema-search-btn {
+    display: none;
+  }
+
+  .pixema-main {
+    padding: 0 16px 20px;
+  }
+
+  .pixema-top {
+    margin-bottom: 14px;
+  }
+
+  .pixema-search-row {
+    gap: 10px;
+  }
+
+  .pixema-search {
+    padding: 10px 12px;
+    border-radius: 10px;
+  }
+
+  .pixema-filter-btn {
+    width: 40px;
+    min-width: 40px;
+    padding: 0;
+    background: #7b61ff;
+    color: #fff;
+    border-radius: 10px;
+  }
+
+  .movies-grid {
+    grid-template-columns: 1fr;
+    gap: 16px;
+  }
+
+  .movie-title {
+    margin-top: 10px;
+  }
+}
