@@ -1,8 +1,8 @@
 export default function FavoritesPage() {
   return (
-    <section>
+    <section className="page">
       <h1>Избранное</h1>
-      <p>Пока пусто. В следующих шагах добавим сохранение избранного.</p>
+      <p>Появится в следующих шагах.</p>
     </section>
   )
 }

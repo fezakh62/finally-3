@@ -1,8 +1,8 @@
 export default function SettingsPage() {
   return (
-    <section>
+    <section className="page">
       <h1>Настройки</h1>
-      <p>Здесь позже появятся тема/профиль/предпочтения.</p>
+      <p>Появится в следующих шагах.</p>
     </section>
   )
 }
