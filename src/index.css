@@ -112,6 +112,13 @@ a.active {
   margin-bottom: 14px;
 }
 
+.page__controls {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 10px;
+}
+
 .searchline {
   display: flex;
   gap: 8px;
@@ -205,6 +212,126 @@ a.active {
   background: rgba(147, 197, 253, 0.18);
   color: inherit;
   cursor: pointer;
+}
+
+.btn--ghost {
+  background: rgba(255, 255, 255, 0.06);
+}
+
+.chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin: 6px 0 14px;
+}
+
+.chip {
+  font-size: 13px;
+  opacity: 0.9;
+  padding: 6px 10px;
+  border-radius: 999px;
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  background: rgba(255, 255, 255, 0.06);
+}
+
+.filters-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.55);
+  display: grid;
+  justify-items: end;
+  z-index: 50;
+}
+
+.filters-drawer {
+  height: 100%;
+  width: min(420px, 92vw);
+  background: #0b1220;
+  border-left: 1px solid rgba(255, 255, 255, 0.12);
+  padding: 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
+.filters-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.filters-close {
+  font-size: 18px;
+  line-height: 1;
+  padding: 8px 10px;
+  border-radius: 10px;
+  border: 1px solid rgba(255, 255, 255, 0.14);
+  background: rgba(255, 255, 255, 0.06);
+  color: inherit;
+  cursor: pointer;
+}
+
+.filters-section {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.filters-label {
+  font-size: 12px;
+  opacity: 0.75;
+  text-transform: uppercase;
+  letter-spacing: 0.12em;
+}
+
+.filters-sort {
+  display: flex;
+  gap: 10px;
+}
+
+.filters-sort button {
+  padding: 10px 12px;
+  border-radius: 12px;
+  border: 1px solid rgba(255, 255, 255, 0.14);
+  background: rgba(255, 255, 255, 0.06);
+  color: inherit;
+  cursor: pointer;
+}
+
+.filters-sort button.active {
+  background: rgba(147, 197, 253, 0.18);
+}
+
+.filter-input {
+  padding: 10px 12px;
+  border-radius: 12px;
+  border: 1px solid rgba(255, 255, 255, 0.14);
+  background: rgba(255, 255, 255, 0.06);
+  color: inherit;
+}
+
+.filters-actions {
+  display: flex;
+  gap: 10px;
+  margin-top: auto;
+}
+
+.filters-clear,
+.filters-show {
+  flex: 1;
+  padding: 10px 12px;
+  border-radius: 12px;
+  border: 1px solid rgba(255, 255, 255, 0.14);
+  color: inherit;
+  cursor: pointer;
+}
+
+.filters-clear {
+  background: rgba(255, 255, 255, 0.06);
+}
+
+.filters-show {
+  background: rgba(147, 197, 253, 0.18);
 }
 
 .hint {
